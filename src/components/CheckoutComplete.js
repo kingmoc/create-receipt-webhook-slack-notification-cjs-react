@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Segment, Header, Image, Icon, Container } from 'semantic-ui-react';
+import { Segment, Header, Image, Icon, Container, Divider } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 import img from '../img/checkout-complete-img.JPG'
@@ -38,6 +38,21 @@ const CheckoutComplete = (props) => {
                             </Container>
                         ))}
                     </section>
+                    <Header size='small'>Shipping: {customerReceipt.order.shipping.price.formatted_with_symbol}</Header> 
+                    <Header>Total: {customerReceipt.order.total.formatted_with_symbol}</Header> 
+                    <Divider horizontal>Shipping To</Divider>       
+                    <Segment>
+                        {customerReceipt.shipping.name}  <br />
+                        {customerReceipt.shipping.street}  <br />
+                        {customerReceipt.shipping.street_2 && (
+                            <>
+                            customerReceipt.shipping.street_2
+                            <br />
+                            </>
+                        )}  
+                        {customerReceipt.shipping.town_city}, {customerReceipt.shipping.county_state} {customerReceipt.shipping.postal_zip_code}  <br />
+                        {customerReceipt.shipping.country} 
+                    </Segment>
                     <Link to='/'>Return to All Products</Link>
                 </div>
                 <Image src={img} size='medium' />
