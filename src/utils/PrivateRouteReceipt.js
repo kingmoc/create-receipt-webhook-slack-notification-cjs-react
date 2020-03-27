@@ -7,9 +7,9 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 
 	return <Route {...rest} render={(props) => {
 
-		if(localStorage.getItem('cart-id')) {
+		if(localStorage.getItem('receipt')) {
 			return <Component {...props} {...rest}/>
-		} 
+		}
 		
 		else {
 			return <Redirect to="/" />

@@ -11,6 +11,7 @@ import ProductContainer from './components/ProductContainer'
 import CheckoutContainer from './components/CheckoutContainer'
 import CheckoutComplete from './components/CheckoutComplete'
 import PrivateRoute from './utils/PrivateRoute'
+import PrivateRouteReceipt from './utils/PrivateRouteReceipt'
 
 export const CartItemsContext = React.createContext()
 
@@ -125,19 +126,10 @@ function App() {
                 setModalOpen={setModalOpen}
                 setReceipt={setReceipt}
             />
-            {/* <PrivateRoute 
+            <PrivateRouteReceipt 
                 component={CheckoutComplete}
                 path={`/order-complete/:checkoutToken/:orderId`}
                 setCheckout={setCheckout} 
-            /> */}
-            <Route path="/order-complete/:checkoutToken/:orderId" render={props => {
-                return (
-                    <CheckoutComplete 
-                        {...props}
-                        setCheckout={setCheckout}
-                    />
-                )
-                }}
             />
             <Footer />
         </div>

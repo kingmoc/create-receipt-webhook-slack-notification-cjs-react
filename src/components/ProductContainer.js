@@ -17,6 +17,7 @@ const ProductContainer = (props) => {
           .catch(err => console.log(err))
 
           props.setCheckout(false)
+          localStorage.removeItem('receipt')
     },[])
 
     return (

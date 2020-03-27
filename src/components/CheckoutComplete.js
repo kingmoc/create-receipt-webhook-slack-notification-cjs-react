@@ -19,6 +19,10 @@ const CheckoutComplete = (props) => {
 
     console.log(customerReceipt, 'receipt object - parsed') 
 
+    const removeReceipt = () => {
+        localStorage.removeItem('receipt')
+    }
+
     return (
         <>
             <Segment className='order-complete'>
@@ -52,7 +56,7 @@ const CheckoutComplete = (props) => {
                         {customerReceipt.shipping.country} 
                     </Segment>
                     <Link to='/'>
-                        <Button secondary size='large'>Shop Again</Button>
+                        <Button secondary size='large' onClick={removeReceipt}>Shop Again</Button>
                     </Link>
                 </div>
                 <Image src={img} size='medium' />
