@@ -165,7 +165,7 @@ const CheckoutForm = (props) => {
                     if (props.shipOption) {
                         commerce.checkout.capture(props.tokenId, final)
                             .then(res => {
-                                    // console.log(res, 'res from CAPTURING CHECKOUT!!!')
+                                    console.log(res, 'res from CAPTURING CHECKOUT!!! (STRIPE)')
                                     props.setReceipt(res)
                                     localStorage.removeItem('cart-id')
                                     history.push(`/order-complete/${props.tokenId}/${res.id}`)
@@ -198,9 +198,10 @@ const CheckoutForm = (props) => {
             if (props.shipOption) {
                 commerce.checkout.capture(props.tokenId, final)
                     .then(res => {
-                            // console.log(res, 'res from CAPTURING CHECKOUT!!!')
+                            console.log(res, 'res from CAPTURING CHECKOUT!!! (TEST-GATEWAY)')
                             props.setReceipt(res)
                             localStorage.removeItem('cart-id')
+                            localStorage.setItem('receipt', JSON.stringify(res))
                             history.push(`/order-complete/${props.tokenId}/${res.id}`)
                             setProcessing(false)
                     })

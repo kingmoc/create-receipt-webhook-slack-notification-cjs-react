@@ -2,6 +2,26 @@
     width: 80%;
     margin: 0 auto !important;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     margin-bottom: 160px !important;
+
+    div {
+        width: 60%;
+    }
+
+    h1 {
+        display: inline;
+    }
+
+    span {
+        color: #34b49f;
+    }
+
+    p {
+        margin-top: 15px;
+    }
+
+    section {
+        width: 50%;
+    }
 }
