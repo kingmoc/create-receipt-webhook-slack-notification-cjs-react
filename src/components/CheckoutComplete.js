@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Segment, Header, Image, Icon, Container, Divider } from 'semantic-ui-react';
+import { Segment, Header, Image, Icon, Container, Divider, Button } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
 import img from '../img/checkout-complete-img.JPG'
@@ -14,12 +14,9 @@ const CheckoutComplete = (props) => {
     const [customerReceipt, setCustomerReceipt] = useState(receipt)
 
     useEffect(() => {
-        // setCustomerReceipt(receipt)
         props.setCheckout(true)
     }, [])
 
-    
-    // console.log(receipt, 'receipt object')
     console.log(customerReceipt, 'receipt object - parsed') 
 
     return (
@@ -31,6 +28,7 @@ const CheckoutComplete = (props) => {
                     <p>
                         Thanks for shopping at Seities Apparel - we sent an email to <span>{customerReceipt.customer.email}</span> with your full receipt. Please check spam if the email has not arrived within 5 minutes. 
                     </p>
+                    <Divider className='divide'/>
                     <section>
                         {customerReceipt.order.line_items.map(item => (
                             <Container className='item-data-container' key={item.id}>
@@ -40,7 +38,7 @@ const CheckoutComplete = (props) => {
                     </section>
                     <Header size='small'>Shipping: {customerReceipt.order.shipping.price.formatted_with_symbol}</Header> 
                     <Header>Total: {customerReceipt.order.total.formatted_with_symbol}</Header> 
-                    <Divider horizontal>Shipping To</Divider>       
+                    <Divider className='divide' horizontal>Shipping To</Divider>       
                     <Segment>
                         {customerReceipt.shipping.name}  <br />
                         {customerReceipt.shipping.street}  <br />
@@ -53,7 +51,9 @@ const CheckoutComplete = (props) => {
                         {customerReceipt.shipping.town_city}, {customerReceipt.shipping.county_state} {customerReceipt.shipping.postal_zip_code}  <br />
                         {customerReceipt.shipping.country} 
                     </Segment>
-                    <Link to='/'>Return to All Products</Link>
+                    <Link to='/'>
+                        <Button secondary size='large'>Shop Again</Button>
+                    </Link>
                 </div>
                 <Image src={img} size='medium' />
             </Segment>

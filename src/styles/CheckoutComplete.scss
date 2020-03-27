@@ -1,5 +1,5 @@
 .order-complete {
-    width: 80%;
+    width: 70%;
     margin: 0 auto !important;
     display: flex;
     justify-content: space-around;
@@ -23,5 +23,9 @@
 
     section {
         width: 50%;
+    }
+
+    .divide {
+        width: 95%;
     }
 }
