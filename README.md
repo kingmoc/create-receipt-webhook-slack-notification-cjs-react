@@ -244,6 +244,10 @@ useEffect(() => {
 
 These actions ensure the customer will only have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
 
+*** *Note *** A little preamble about webhooks*
+
+### Step 4. Setup URL to Receive Webhook Payload
+
 <!-- ### Step 2. Add Checkout Button & Setup Route to Form
 <p align="center">
   <img src="src/img/Guide-3/checkout-button.JPG">
