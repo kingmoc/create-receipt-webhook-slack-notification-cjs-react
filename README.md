@@ -224,9 +224,9 @@ const removeReceipt = () => {
 
 Once clicked, `removeReceipt()` will delete the key **'`receipt`'** from local storage.  Because of the private route created, the customer will not be able to navigate back to the conformation page.  
 
-Now - let's access what happens when a customer presses back.  I already have another private route setup to check if the **'`cart-id`'** key is in local storage - if `false` the customer will NOT be able to view the checkout page (***because that cart has already been emptied based on a successfully capture***) and will be routed home.
+Now - let's access what happens when a customer presses back.  The previous page is the checkout page which displays cart info and a form to capture a checkout.  I already have another private route setup to check if the **'`cart-id`'** key is in local storage - if `false` the customer will NOT be able to view the checkout page (***because that cart has already been emptied based on a successfully capture***) and will be routed home.
 
-I now need to remove the **'`receipt`'** object (*from local storage*) whenever the `<ProductContainer />` component is loaded. Whenever the `<ProductContainer />` component is rendered, there should **NEVER** be a **'`receipt`'** object in local storage.  I can simply add the removal in the `useEffect()` to always delete the desired key upon every render: 
+I now need to remove the **'`receipt`'** object (*from local storage*) whenever the `<ProductContainer />` component is loaded. Whenever the `<ProductContainer />` component is rendered (***which is essentially our home page***), there should **NEVER** be a **'`receipt`'** object in local storage.  I can simply add the removal in the `useEffect()` to always delete the desired key upon every render: 
 
 ```javascript
 // *** ProductContainer.js ***
@@ -242,7 +242,7 @@ useEffect(() => {
 },[])
 ```
 
-These actions ensure the customer will only have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
+These actions ensure the customer will **ONLY** have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
 
 *** *Note *** A little preamble about webhooks*
 
