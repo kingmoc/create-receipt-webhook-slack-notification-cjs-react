@@ -28,7 +28,6 @@ const CheckoutComplete = (props) => {
             <Segment className='order-complete'>
                 <div>
                     <h1>Your order <span>{customerReceipt.customer_reference}</span> is complete!</h1>
-                    {/* <Icon name='check circle outline' size='big' color='green' /> */}
                     <p>
                         Thanks for shopping at Seities Apparel - we sent an email to <span>{customerReceipt.customer.email}</span> with your full receipt. Please check spam if the email has not arrived within 5 minutes. 
                     </p>
@@ -48,7 +47,7 @@ const CheckoutComplete = (props) => {
                         {customerReceipt.shipping.street}  <br />
                         {customerReceipt.shipping.street_2 && (
                             <>
-                            customerReceipt.shipping.street_2
+                            {customerReceipt.shipping.street_2}
                             <br />
                             </>
                         )}  

@@ -86,6 +86,86 @@ I can confirm local storage has the proper information with the key set to '`rec
 
 ### Step 2. Retrieving Receipt Data for Display
 
+Accessing the data in local storage is as straightforward as putting it in local storage.  You just use `localStorage.getItem()` and pass it a `key`: 
+
+```javascript
+// *** CheckoutComplete.js ***
+const receipt = JSON.parse(localStorage.getItem('receipt'))
+```
+
+Just as you needed to **`stringify`** previsouly - you also must use [`JSON.parse()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) in order to get the data into a format needed to utilize the data.  You can log the '`receipt`' variable and you will see it's identical to the response we logged post capture.  
+
+#### The `<CheckoutComplete />` component
+
+It is time to update the `<CheckoutComplete />` component with all the useful data a customer would like to see after completing a purchase.  Now that you have a variable that contains everything, let's initialize state with the new data: 
+
+```javascript
+// *** CheckoutComplete.js ***
+
+// Parsing local storage data
+const receipt = JSON.parse(localStorage.getItem('receipt'))
+
+// Initializing state with our local storage data
+const [customerReceipt, setCustomerReceipt] = useState(receipt)
+```
+
+One intialized, you can now use the state object to render whichever customer data you choose.  Again this portion is completely up to you, but here's an example of some of the data one can show: 
+
+<p align="center">
+  <img src="src/img/Guide-4/confirm-pg-zoomed.JPG">
+</p>
+
+```javascript
+// *** CheckoutComplete.js ***
+return (
+<>
+    <Segment className='order-complete'>
+        <div>
+            <h1>Your order <span>{customerReceipt.customer_reference}</span> is complete!</h1>
+            <p>
+                Thanks for shopping at Seities Apparel - we sent an email to <span>{customerReceipt.customer.email}</span> with your full receipt. Please check spam if the email has not arrived within 5 minutes. 
+            </p>
+            <Divider className='divide'/>
+            <section>
+                {customerReceipt.order.line_items.map(item => (
+                    <Container className='item-data-container' key={item.id}>
+                        <CheckoutItems item={item}/>
+                    </Container>
+                ))}
+            </section>
+            <Header size='small'>
+                Shipping: {customerReceipt.order.shipping.price.formatted_with_symbol}
+            </Header> 
+            <Header>
+                Total: {customerReceipt.order.total.formatted_with_symbol}
+            </Header> 
+            <Divider className='divide' horizontal>Shipping To</Divider>       
+            <Segment>
+                {customerReceipt.shipping.name}  <br />
+                {customerReceipt.shipping.street}  <br />
+                {customerReceipt.shipping.street_2 && (
+                    <>
+                    {customerReceipt.shipping.street_2}
+                    <br />
+                    </>
+                )}  
+                {customerReceipt.shipping.town_city}, {customerReceipt.shipping.county_state} {customerReceipt.shipping.postal_zip_code}  <br />
+                {customerReceipt.shipping.country} 
+            </Segment>
+            <Link to='/'>
+                <Button secondary size='large' onClick={removeReceipt}>Shop Again</Button>
+            </Link>
+        </div>
+        <Image src={img} size='medium' />
+    </Segment>
+</>
+);
+```
+
+As you can see, this portion is all about taking the data given and displaying it however you see fit.  
+
+### Step. 3 Add Private Route & Removing Data from Local Storage
+
 <!-- ### Step 2. Add Checkout Button & Setup Route to Form
 <p align="center">
   <img src="src/img/Guide-3/checkout-button.JPG">
