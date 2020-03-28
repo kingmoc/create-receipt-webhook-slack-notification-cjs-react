@@ -109,7 +109,7 @@ const receipt = JSON.parse(localStorage.getItem('receipt'))
 const [customerReceipt, setCustomerReceipt] = useState(receipt)
 ```
 
-One intialized, you can now use the state object to render whichever customer data you choose.  Again this portion is completely up to you, but here's an example of some of the data one can show: 
+Once initialized, you can now use the state object to render whichever customer data you choose.  Again this portion is completely up to you, but here's an example of some of the data one can show: 
 
 <p align="center">
   <img src="src/img/Guide-4/confirm-pg-zoomed.JPG">
@@ -165,6 +165,84 @@ return (
 As you can see, this portion is all about taking the data given and displaying it however you see fit.  
 
 ### Step. 3 Add Private Route & Removing Data from Local Storage
+
+I've completed the component that will display information for the customer - now what &#129335;!? I want this information displayed as long as the customer hasn't navigated away - either by pressing **back** or clicking **shop again** button.  
+
+Once the customer navigates away, they should **NOT** be able to return and still render the receipt info.  
+
+#### Private Route for the `<CheckoutComplete />` component
+
+In order to achieve this I will setup a private route to the `<CheckoutComplete />` component that only renders if the '`receipt`' object is stored in local storage: 
+
+```javascript
+// *** PrivateRouteReceipt.js ***
+const PrivateRoute = ({ component: Component, ...rest }) => {
+	
+	return <Route {...rest} render={(props) => {
+
+		if(localStorage.getItem('receipt')) {
+			return <Component {...props} {...rest}/>
+		}
+		
+		else {
+			return <Redirect to="/" />
+		}
+
+	}} />
+}
+```
+
+This function checks to see if **'`receipt`'** exist in local storage - if `true`, the function will return the `<CheckoutComplete />` component; if `false` the customer will be redirected to home (`to="/"`). 
+
+Let's add this private route to our `<CheckoutComplete />` component: 
+
+```javascript
+// *** App.js ***
+<PrivateRouteReceipt 
+    component={CheckoutComplete}
+    path={`/order-complete/:checkoutToken/:orderId`}
+    setCheckout={setCheckout} 
+/>
+```
+
+#### Removing from local storage
+
+The last step is to actually remove the data from local storage.  As mentioned, once the customer navigates from the page, they should not be able to navigate back again.  
+
+One obvious place to remove data from local storage is when `shop again` button is clicked.  I created a function that does this: 
+
+```
+<Link to='/'>
+    <Button secondary size='large' onClick={removeReceipt}>Shop Again</Button>
+</Link>
+```
+```
+const removeReceipt = () => {
+    localStorage.removeItem('receipt')
+}
+```
+
+Once clicked, `removeReceipt()` will delete the key **'`receipt`'** from local storage.  Because of the private route created, the customer will not be able to navigate back to the conformation page.  
+
+Now - let's access what happens when a customer presses back.  I already have another private route setup to check if the **'`cart-id`'** key is in local storage - if `false` the customer will NOT be able to view the checkout page (***because that cart has already been emptied based on a successfully capture***) and will be routed home.
+
+I now need to remove the **'`receipt`'** object (*from local storage*) whenever the `<ProductContainer />` component is loaded. Whenever the `<ProductContainer />` component is rendered, there should **NEVER** be a **'`receipt`'** object in local storage.  I can simply add the removal in the `useEffect()` to always delete the desired key upon every render: 
+
+```javascript
+// *** ProductContainer.js ***
+useEffect(() => {
+    commerce.products.list()
+        .then(res => {
+        setProducts(res.data)
+        })
+        .catch(err => console.log(err))
+
+        props.setCheckout(false)
+        localStorage.removeItem('receipt') //Added to remove key from LS
+},[])
+```
+
+These actions ensure the customer will only have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
 
 <!-- ### Step 2. Add Checkout Button & Setup Route to Form
 <p align="center">
