@@ -1,72 +1,92 @@
-# Creating a single page checkout using Commerce.js (SDK) and React.js
+# Creating a receipt and webhook notification with Commerce.js
 
-This guide explains the process and procedure to capture a checkout using React.js & Commerce.js (SDK)
+This guide explains how to create a receipt page along with using webhooks provided by Commerce.js and the Chec Dashboard. 
 
-[Live demo for this Guide: "***Creating a single page checkout***"](https://seities-store-cjs-react-guide.netlify.com/)
+[Live demo for this Guide: "***Creating a receipt and webhook notification***"](https://seities-store-cjs-react-guide.netlify.com/)
 
 ****** *Note* ******
 
 * *This guide is using v2 of the SDK*
 * *The Live Demo is best viewed on Desktop (**responsiveness limited**)*
-* *This is a continuation of a previous guide - [Adding products to your cart](https://github.com/kingmoc/adding-products-cart-cjs-react)*
+* *This is a continuation of a previous guide - [Single page checkout](https://single-page-checkout-cjs.netlify.com/)*
 
 **********
 
-![](src/img/Guide-3/hero-3.JPG)
+![](src/img/Guide-4/hero.JPG)
 
 ## Overview
-You now have come to an important part of the eCommerce journey - payment processing and capturing an order.  And just a quick recap: I added products to the Chec Dashboard and listed them on the site, I was then able to add chosen products to the cart, and now I want those items in the cart to be processed - get customer information and finalize payment; all with Commerce.js and the SDK.  The order will then be added to your Chec dashboard along with customer info and other important data.  There's a lot of information packed in this guide, so let's dive in!   
+After I capture a checkout and processed the payment, I now want to provide some confirmation of purchase to the customer.  Thankfully the Commerce.js SDK (post capture) provides all the data needed in order to curate a 'receipt' or conformation page.  I will be using that data to display to the customer some of the order details and shipping info.  Lastly I will incorporate webhooks provided by Commerce.js via the Chec Dashboard to help send a Slack notification that a new order has been placed! Let's get started ... 
 
 #### This guide will cover: 
 
-1. Create new shipping zone & add zone to product 
-2. Add checkout button & setup route to checkout form 
-3. Create Form
-4. Handling Form Data/Validation/Errors 
-5. Handling Discount Code
-6. Capturing Checkout & route to Thank You page (*Thanks for Your Order*)
-
-##### ***** *Extra* *****
-How to implement Stripe as a payment gatway
-*******
-*This guide strictly utilizes functional react components and relies heavenly on react hooks and dynamic rendering.  The purpose of this guide is to show how you can use the SDK to build eCommerce functionality and not a true deep dive into react. There will be links to outside resources that can further explain certain react features.*
+1. Saving receipt info to local storage
+2. Retrieving receipt data for display
+3. Add private route & removing data from local storage
+4. Setup URL to receive webhook payload
+5. Add webhook in Chec Dashboard
+6. Send notification message to Slack channel
 
 ### Requirements/Prerequisites
 
 - [ ] IDE of your choice (code editor)
 - [ ] [NodeJS](https://nodejs.org/en/), or [yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable) → npm or yarn.
 - [ ] Some knowledge of Javascript & React
-- [ ] *Bonus* - Using [React Hooks](https://reactjs.org/docs/hooks-reference.html) - specifically `useState()`, `useEffect()`, `useContext()`
-- [ ] *Bonus* - familiarity with [React Router](https://reacttraining.com/react-router/web/api/Route)
-- [ ] *Bonus* - familiarity with [React Hook Form](https://react-hook-form.com/api/)
-- [ ] *Bonus* - familiarity with [Stripe](https://stripe.com/docs)
+- [ ] Some knowledge of [webhooks](https://sendgrid.com/blog/whats-webhook/)
+- [ ] *Bonus* - Using [React Hooks](https://reactjs.org/docs/hooks-reference.html) - specifically `useState()`
+- [ ] *Bonus* - [React Router](https://reacttraining.com/react-router/web/api/Route)
+- [ ] *Bonus* - [Node/Express](https://expressjs.com/)
+- [ ] *Bonus* - [Slack API - webhooks](https://slack.com/help/articles/115005265063-Incoming-Webhooks-for-Slack)
 - [ ] *Bonus* - familiarity with the framework [Semantic UI (react) library](https://react.semantic-ui.com/)
 
 ## Getting Started
 
-### STEP 1. Creating Shipping Zone & Adding to Product:
+### STEP 1. Saving Receipt Info to Local Storage:
 
-One of the most important steps to capturing an order is determining the logistics of how you will ship your products.  You need to answer questions like: Where will I ship? How much will I charge? Will it be a flat fee to place A etc...
+The SDK used to provide a helper function you could pass the checkout token and get the receipt info - unfortunately that function is no longer live &#128532;.  This is because under the hood, the function hit an endpoint that required your secret key.  The SDK only utilizes helper functions with your public API key.  
 
-For this example, we will have 3 shipping zones: United States, Mexico, Canada.  I will be charging a flat rate (see below) for each zone and in order to set this up, you must navigate to the ***Shipping Tab*** within your setup and click **Add Zone**
-
-<p align="center">
-  <img src="src/img/Guide-3/shipping-zone.JPG">
-</p>
-
-Now that I've added the shipping zones I wish to ship to, including price - I must further add these zones to my product.  Each product can have different shipping zones, but for simplicity I'm going to add all three zones to every product in the catalog. 
-
-#### Add Zone to Product
-
-Navigate to each individual product and click the enable zone button.  This will enable a particular shipping option for the product.  You can also add any extra shipping cost such as an amount for one order vs multiple.  
+No worries &#128515; - you can make use of the browser's local storage as a way to save data.  Let's take a look at the response from capturing a checkout:   
 
 <p align="center">
-  <img src="src/img/Guide-3/product-zones.JPG">
+  <img src="src/img/Guide-4/post-capture.JPG">
 </p>
 
-This is an important step and must be completed before you can capture a checkout. As you will see further in this guide, the shipping option is needed for Chec to process and finalize an order. You also want to give customers a shipping price so they have a total amount due. In our checkout form, once the customer chooses their country – the shipping options available for that country will be presented.  
+As you can see this entire response is essentially the cutomer receipt.  Inside the `then()` function connected to our `commerce.checkout.capture()` - I can save this data to [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage): 
 
-### Step 2. Add Checkout Button & Setup Route to Form
+```javascript
+// *** CheckoutForm.js ***
+commerce.checkout.capture(props.tokenId, final)
+    .then(res => {
+            props.setReceipt(res)
+            localStorage.removeItem('cart-id')
+            localStorage.setItem('receipt', JSON.stringify(res))
+            history.push(`/order-complete/${props.tokenId}/${res.id}`)
+            setProcessing(false)
+    })
+```
+*** *Note *** You must **[stringify](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)** the response object when adding to local storage*
+
+```
+localStorage.setItem('receipt', JSON.stringify(res))
+```
+
+**A quick recap of what's happening post capture:** 
+- `props.setReceipt(res)` triggers a call on the homepage to update cart info
+- `localStorage.removeItem('cart-id')` removes cart-id for routing logic
+- `localStorage.removeItem('cart-id')` ***new* - adding receipt data to local storage**
+- ``history.push(`/order-complete/${props.tokenId}/${res.id}`)`` routing the customer to the conformation page
+- `setProcessing(false)` logic trigger for displaying cart icon
+
+#### Checking Local Storage for data
+
+Now that I've added the data to local storage, let's check to make sure it is there.  Go to your browser and inspect your page.  The inspect window will have tabs and you should locate the **`Application`** tab.  From there you will see a **`Local Storage`** dropdown with a specific domain. Click the domain and you will see a list of all objects stored in local storage:
+
+![](src/img/Guide-4/local-storage.JPG)
+
+I can confirm local storage has the proper information with the key set to '`receipt`'.  It is important to note this data will always be stored in the browser until it is either manual deleted or removed in code (*I'll cover this later* &#129488;).  I can now access this data anywhere in my app! Let's see about retrieving ...
+
+### Step 2. Retrieving Receipt Data for Display
+
+<!-- ### Step 2. Add Checkout Button & Setup Route to Form
 <p align="center">
   <img src="src/img/Guide-3/checkout-button.JPG">
 </p>
@@ -1072,5 +1092,5 @@ Once you've put all the necessary info into the form go ahead and test the Strip
 
 <p align="center">
   <img src="src/img/Guide-3/complete-order-stripe.JPG">
-</p>
+</p> -->
 
