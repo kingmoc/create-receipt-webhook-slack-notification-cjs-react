@@ -471,7 +471,7 @@ Hopefully you can now see the power of using webhooks.  Once setup, you can auto
 - Parsed payload from Commerce.js webhook and made API call to Slack's incoming webhook URL
 
 This guide is a continuation of a previous guide:
- - [Single page checkout](https://single-page-checkout-cjs.netlify.com/) - A step by step showing the process to capture an order.   
+ - [Single page checkout](https://github.com/kingmoc/single-page-checkout-cjs-react) - A step by step showing the process to capture an order.   
 
 [LIVE DEMO](https://seities-store-cjs-react-guide.netlify.com/)
 
