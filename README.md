@@ -275,7 +275,7 @@ server.listen(PORT, () => {
 });
 ```
 
-Further, once my server is setup, I will using express to handle **`http`** requests.  For the purposes of this example, we only need to create one endpoint that accepts a **`POST`** request: 
+Further, once my server is setup, I will be using express to handle **`http`** requests.  For the purposes of this example, we only need to create one endpoint that accepts a **`POST`** request: 
 
 ```javascript
 // *** server.js ***
@@ -299,7 +299,7 @@ Now that my endpoint is setup and I'm logging the body (*in order to see what's 
   <img src="src/img/Guide-4/add-webhook-info.JPG">
 </p>
 
-Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the body so if the test runs successfully, I can see the webhook payload (*a fancy word for data*). Under options click `View details`:
+Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the body so if the test runs successfully, I can see the webhook payload (*another word for data*). Under options click `View details`:
 
 <p align="center">
   <img src="src/img/Guide-4/webhook-view-details.JPG">
@@ -319,7 +319,7 @@ Because I sent back a *200* status code a green check mark will display if succe
 
 #### Capture an Order! 
 
-Remember, the ultimate goal is take some data that is sent to our server (***whenever the webhook event is triggered***) - then use the new data to send a notification to Slack.  Before I proceed, let's look at the payload whenever the webhook event is triggered.  All I have to do is capture an order and see the data that gets logged in our server ... 
+Remember, the ultimate goal is take some data that is sent to your server (***whenever the webhook event is triggered***) - then use the new data to send a notification to Slack.  Before I proceed, let's look at the payload whenever the webhook event is triggered.  All I have to do is capture an order and see the data that gets logged in my server ... 
 
 <p align="center">
   <img src="src/img/Guide-4/webhook-capture-payload.JPG">
@@ -329,7 +329,7 @@ With further investigation you'll notice this looks a lot like the response retu
 
 ### Step 6. Send Notification Message to Slack Channel
 
-Now that I have the necessary data to compile a notification - I need to decide what to send to Slack.  I won't be grabbing everything but just some important data I would like to be notified about in the event an order has been captured: 
+Now that I have the necessary data to compile a notification - I need to decide what to send to Slack.  I don't need everything; but just some important data I would like to be notified about in the event an order has been captured: 
 
 - reference_id
 - name
@@ -338,7 +338,7 @@ Now that I have the necessary data to compile a notification - I need to decide 
 - '#' of items ordered
 - order amount
 
-I will [deconstuct](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) in order to get the data I need: 
+I will [deconstuct](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) to get the data needed: 
 
 ```
 // *** server.js ***
@@ -348,15 +348,15 @@ let { customer_reference, customer, shipping, order } = req.body.payload
 
 #### Creating the Slack App & Incoming webhook
 
-In the spirit of webhooks - Slack has the ability to add incoming webhooks in order to post messages in a particular Slack workspace.  In order to achieve this, you **MUST** create a Slack App and give the specified Slack workspace access to the app.  [Here is a step by step!](https://slack.com/help/articles/115005265063-Incoming-Webhooks-for-Slack)
+In the spirit of webhooks - Slack has the ability to add incoming webhooks in order to post messages in a particular Slack workspace.  To achieve this, you **MUST** create a Slack App and give the specified Slack workspace access to the app.  [Here is a step by step!](https://slack.com/help/articles/115005265063-Incoming-Webhooks-for-Slack)
 
-For testing I created a brand new Slack workspace and gave the proper access to my Slack App "New Order".  
+For testing I created a brand new Slack workspace and gave the proper access to my Slack App **"New Order"**.  
 
 <p align="center">
   <img src="src/img/Guide-4/slack-app-list.JPG">
 </p>
 
-I can now add an incoming webhook via Slack that will generate a URL.  This endpoint when sent a **`POST`** request with message data in the body will automatically post the message in the configured channel.  I set this incoming webhook to post in an ***#ecommerce*** channel created in my FTT Slack workspace. 
+I can now add an incoming webhook via Slack that will generate an URL.  This endpoint when sent a **`POST`** request with message data in the body will automatically post the message in the configured channel.  I set this incoming webhook to post in an ***#ecommerce*** channel created in my FTT Slack workspace. 
 
 <p align="center">
   <img src="src/img/Guide-4/slack-incoming-webhook.JPG">
@@ -461,14 +461,14 @@ If everything is configured properly whenever an order is captured, you will get
 
 #### Conclusion 
 
-
+Hopefully you can now see the power of using webhooks.  Once setup, you can automate a lot of tasks or other actions more efficiently.  Commerce.js suite of webhooks will be very helpful in the building of your eCommerce website.  Instead of relying on one source to confirm a new order, Commerce.js can now send that same 'receipt' data to another server instantly.  You can use this data to send out custom emails or save it to your personal database - Slack notifications are only the beginning.  Here's a final recap!
  
-- 
-- 
-- 
-- 
-- 
-- 
+- Added receipt info (*response from order capture*) and setting to local storage
+- Used the local storage data to create conformation page for customer
+- Added a private route and setup logic so customer can't navigate back to receipt page
+- Setup the server and configured endpoint for Commerce.js webhook
+- Added webhook in Chec Dashboard and set URL to my configured endpoint
+- Parsed payload from Commerce.js webhook and made API call to Slack's incoming webhook URL
 
 This guide is a continuation of a previous guide:
  - [Single page checkout](https://single-page-checkout-cjs.netlify.com/) - A step by step showing the process to capture an order.   
