@@ -42,7 +42,7 @@ After I capture a checkout and processed the payment, I now want to provide some
 
 ### STEP 1. Saving Receipt Info to Local Storage:
 
-The SDK used to provide a helper function you could pass the checkout token and get the receipt info - unfortunately that function is no longer live &#128532;.  This is because under the hood, the function hit an endpoint that required your secret key.  The SDK only utilizes helper functions with your public API key.  
+The SDK previously provided a helper function you could pass the checkout token and get the receipt info - unfortunately that function is no longer live &#128532;.  This is because under the hood, the function hit an endpoint that required your secret key.  The SDK only utilizes helper functions with your public API key.  
 
 No worries &#128515; - you can make use of the browser's local storage as a way to save data.  Let's take a look at the response from capturing a checkout:   
 
@@ -82,7 +82,7 @@ Now that I've added the data to local storage, let's check to make sure it is th
 
 ![](src/img/Guide-4/local-storage.JPG)
 
-I can confirm local storage has the proper information with the key set to '`receipt`'.  It is important to note this data will always be stored in the browser until it is either manual deleted or removed in code (*I'll cover this later* &#129488;).  I can now access this data anywhere in my app! Let's see about retrieving ...
+I can confirm local storage has the proper information with the key set to '`receipt`'.  It is important to note this data will always be stored in the browser's local storage until it is either manual deleted or removed in code (*I'll cover this later* &#129488;).  I can now access this data anywhere in my app! Let's see about retrieving ...
 
 ### Step 2. Retrieving Receipt Data for Display
 
@@ -93,7 +93,7 @@ Accessing the data in local storage is as straightforward as putting it in local
 const receipt = JSON.parse(localStorage.getItem('receipt'))
 ```
 
-Just as you needed to **`stringify`** previsouly - you also must use [`JSON.parse()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) in order to get the data into a format needed to utilize the data.  You can log the '`receipt`' variable and you will see it's identical to the response we logged post capture.  
+Just as you needed to **`stringify`** previsouly - you also must use [`JSON.parse()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) in order to get the data into a format needed for utilization.  You can log the '`receipt`' variable and you will see it's identical to the response we logged post capture.  
 
 #### The `<CheckoutComplete />` component
 
@@ -242,7 +242,7 @@ useEffect(() => {
 },[])
 ```
 
-These actions ensure the customer will **ONLY** have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
+These actions ensure the customer will **ONLY** have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation/routing logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
 
 *** ***Note** *** In order to proceed, you will need to have some knowledge about setting up a server along with handling http request.*
 
@@ -293,13 +293,13 @@ For the moment, this is all that needs to be done.  In the next step I will conf
 
 ### Step 5. Add Webhook in Chec Dashboard
 
-Now that my endpoint is setup and I'm logging the body (*in order to see what's coming through*), I need to add that URL and configure the webhook from the Chec Dashboard.  Navigate to `Setup` and click the `Webhooks` tab.  Once you're in the `webhooks` menu, click **`+ ADD WEBHOOK`** button: 
+Now that my endpoint is setup and I'm logging the **`req.body`** (*in order to see what's coming through*), I need to add that URL and configure the webhook from the Chec Dashboard.  Navigate to `Setup` and click the `Webhooks` tab.  Once you're in the `webhooks` menu, click **`+ ADD WEBHOOK`** button: 
 
 <p align="center">
   <img src="src/img/Guide-4/add-webhook-info.JPG">
 </p>
 
-Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the body so if the test runs successfully, I can see the webhook payload (*another word for data*). Under options click `View details`:
+Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the **`req.body`** so if the test runs successfully, I can see the webhook payload (*another word for data*). Under options click `View details`:
 
 <p align="center">
   <img src="src/img/Guide-4/webhook-view-details.JPG">
@@ -311,7 +311,7 @@ You will see a button that says **`SEND TEST REQUEST`**.  If configured properly
   <img src="src/img/Guide-4/test-payload.JPG">
 </p>
 
-Because I sent back a *200* status code a green check mark will display if successful: 
+Because I sent back a *200* status code, a green check mark will display if successful: 
 
 <p align="center">
   <img src="src/img/Guide-4/test-status-200.JPG">
@@ -463,7 +463,7 @@ If everything is configured properly whenever an order is captured, you will get
 
 Hopefully you can now see the power of using webhooks.  Once setup, you can automate a lot of tasks or other actions more efficiently.  Commerce.js suite of webhooks will be very helpful in the building of your eCommerce website.  Instead of relying on one source to confirm a new order, Commerce.js can now send that same 'receipt' data to another server instantly.  You can use this data to send out custom emails or save it to your personal database - Slack notifications are only the beginning.  Here's a final recap!
  
-- Added receipt info (*response from order capture*) and setting to local storage
+- Added receipt info (*response from order capture*) and set to local storage
 - Used the local storage data to create conformation page for customer
 - Added a private route and setup logic so customer can't navigate back to receipt page
 - Setup the server and configured endpoint for Commerce.js webhook
