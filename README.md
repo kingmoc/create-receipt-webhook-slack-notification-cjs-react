@@ -244,9 +244,114 @@ useEffect(() => {
 
 These actions ensure the customer will **ONLY** have access to the receipt info **UNTIL** they navigate elsewhere.  Okie dokie! That pretty much sums up handling the receipt info along with proper navigation logic.  The next steps pertain to setting up and configuring webhooks &#128526;. 
 
-*** *Note *** A little preamble about webhooks*
+*** ***Note** *** In order to proceed, you will need to have some knowledge about setting up a server along with handling http request.*
 
 ### Step 4. Setup URL to Receive Webhook Payload
+
+Commerce.js has recently added webhook functionality within the Chec Dashboard.  This means as a developer you can select among many actions/events that when triggered will send specific data associated with that event to a specified URL.  Some actions include: 
+
+- When a checkout capture occurs
+- Whenever an order gets fulfilled
+- Once a new product is created
+
+<p align="center">
+  <img src="src/img/Guide-4/webhook-events.JPG">
+</p>
+
+As you can see there are many different webhook events you can choose from.  This is very beneficial in that you don't have to ping an endpoint or use the SDK to see about certain data changes.  Once configured, your server will automatically get a notification (***a http post request***) whenever an event takes place.  In this example I will be configuring a webhook event for whenever an order is captured.  
+
+#### Setting up your endpoint
+
+As mentioned previously, you can setup your server using the technology of your choice - I choose to setup a popup server using Node.js:
+
+```javascript
+// *** index.js ***
+const server = require('./server.js');
+
+const PORT = process.env.PORT || 7500;
+
+server.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}...`);
+});
+```
+
+Further, once my server is setup, I will using express to handle **`http`** requests.  For the purposes of this example, we only need to create one endpoint that accepts a **`POST`** request: 
+
+```javascript
+// *** server.js ***
+server.post('/new-order', (req, res) => {
+
+    // Just logging the body of the request
+    console.log(req.body, 'data from webhook call')
+
+    // Sending a 200 to show success
+    res.status(200).json({message: "success"})
+        
+})
+```
+For the moment, this is all that needs to be done.  In the next step I will configure the webhook in the Chec Dashboard with the newly created URL - **`myserver.com/new-order`**
+
+### Step 5. Add Webhook in Chec Dashboard
+
+Now that my endpoint is setup and I'm logging the body (*in order to see what's coming through*), I need to add that URL and configure the webhook from the Chec Dashboard.  Navigate to `Setup` and click the `Webhooks` tab.  Once you're in the `webhooks` menu, click **`+ ADD WEBHOOK`** button: 
+
+<p align="center">
+  <img src="src/img/Guide-4/add-webhook-info.JPG">
+</p>
+
+Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the body so if the test runs successfully, I can see the webhook payload (*a fancy word for data*). Under options click `View details`:
+
+<p align="center">
+  <img src="src/img/Guide-4/webhook-view-details.JPG">
+</p>
+
+You will see a button that says **`SEND TEST REQUEST`**.  If configured properly you will see some data logged on your server: 
+
+<p align="center">
+  <img src="src/img/Guide-4/test-payload.JPG">
+</p>
+
+Because I sent back a *200* status code a green check mark will display if successful: 
+
+<p align="center">
+  <img src="src/img/Guide-4/test-status-200.JPG">
+</p>
+
+#### Capture an Order! 
+
+Remember, the ultimate goal is take some data that is sent to our server (***whenever the webhook event is triggered***) - then use the new data to send a notification to Slack.  Before I proceed, let's look at the payload whenever the webhook event is triggered.  All I have to do is capture an order and see the data that gets logged in our server ... 
+
+<p align="center">
+  <img src="src/img/Guide-4/webhook-capture-payload.JPG">
+</p>
+
+With further investigation you'll notice this looks a lot like the response returned whenever an order is captured using the SDK helper function! We should take a step back and look at the big picture.  Because of this webhook provided by Commerce.js - whenever an order is captured the system will send that receipt data to the specified URL.  On the server side all I have to do is take that data and perform whatever task needed &#129299;. 
+
+### Step 6. Send Notification Message to Slack Channel
+
+Now that I have the necessary data to compile a notification - I need to decide what to send to Slack.  I won't be grabbing everything but just some important data I would like to be notified about in the event an order has been captured: 
+
+- reference_id
+- name
+- email
+- country
+- '#' of items ordered
+- order amount
+
+I will [deconstuct](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) in order to get the data I need: 
+
+```
+// *** server.js ***
+
+let { customer_reference, customer, shipping, order } = req.body.payload
+```
+
+#### Sending messages to Slack
+
+In the spirit of webhooks - Slack has the ability to add incoming webhooks in order to post messages in a particular Slack workspace.  In order to acheieve this, you **MUST** create a Slack App and give the specified Slack workspace access to the app.  [Here is a step by step!](https://slack.com/help/articles/115005265063-Incoming-Webhooks-for-Slack)
+
+For testing I created a brand new Slack workspace and gave the proper access to my Slack App "New Order".  
+
 
 <!-- ### Step 2. Add Checkout Button & Setup Route to Form
 <p align="center">
