@@ -456,7 +456,7 @@ axios.post(process.env.SLACK_WEBHOOK, newOrderMessage)
 If everything is configured properly whenever an order is captured, you will get a Slack notification in the proper Slack channel! 
 
 <p align="center">
-  <img src="src/img/Guide-4/final-flow-webhooks.GIF">
+  <img src="src/img/Guide-4/final-flow-webhooks.gif">
 </p>
 
 #### Conclusion 
