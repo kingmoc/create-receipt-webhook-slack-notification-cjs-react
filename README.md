@@ -8,7 +8,7 @@ This guide explains how to create a receipt page along with using webhooks provi
 
 * *This guide is using v2 of the SDK*
 * *The Live Demo is best viewed on Desktop (**responsiveness limited**)*
-* *This is a continuation of a previous guide - [Single page checkout](https://single-page-checkout-cjs.netlify.com/)*
+* *This is a continuation of a previous guide - [Single page checkout](https://github.com/kingmoc/single-page-checkout-cjs-react)*
 
 **********
 
