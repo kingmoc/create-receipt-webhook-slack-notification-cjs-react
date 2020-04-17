@@ -16,7 +16,7 @@ This guide explains how to create a receipt page along with using webhooks provi
 
 ## Overview
 
-After capturing the order from the checkout token object successfully using the Commerce.js cart.capture method, you now want to curate a thank-you or confirmation page using the receipt object returned. You will also be using that data to display to the customer some of the order details and shipping info. Lastly I will incorporate webhooks provided by Commerce.js via the Chec Dashboard to help send a Slack notification that a new order has been placed! Let's get started ... 
+After we capture a checkout and processed the payment, we now want to provide some confirmation of purchase to the customer.  Thankfully the Commerce.js SDK (post capture) provides all the data needed in order to curate a 'receipt' or conformation page.  We will be using that data to display to the customer some of the order details and shipping info.  Lastly we will incorporate webhooks provided by Commerce.js via the Chec Dashboard to help send a Slack notification that a new order has been placed! Let's get started ... 
 
 #### This guide will cover: 
 
@@ -59,7 +59,7 @@ But for simplicity and remembering to remove the data from the browser, we will 
   <img src="src/img/Guide-4/post-capture.JPG">
 </p>
 
-As you can see this entire response is essentially the customer receipt.  Inside the `then()` function connected to our `commerce.checkout.capture()` - I can save this data to [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage): 
+As you can see this entire response is essentially the cutomer receipt.  Inside the `then()` function connected to our `commerce.checkout.capture()` - we can save this data to [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage): 
 
 ```javascript
 // *** CheckoutForm.js ***
@@ -87,11 +87,11 @@ localStorage.setItem('receipt', JSON.stringify(res))
 
 #### Checking Local Storage for data
 
-Now that I've added the data to local storage, let's check to make sure it is there.  Go to your browser and inspect your page.  The inspect window will have tabs and you should locate the **`Application`** tab.  From there you will see a **`Local Storage`** dropdown with a specific domain. Click the domain and you will see a list of all objects stored in local storage:
+Now that you've added the data to local storage, let's check to make sure it is there.  Go to your browser and inspect your page.  The inspect window will have tabs and you should locate the **`Application`** tab.  From there you will see a **`Local Storage`** dropdown with a specific domain. Click the domain and you will see a list of all objects stored in local storage:
 
 ![](src/img/Guide-4/local-storage.JPG)
 
-I can confirm local storage has the proper information with the key set to '`receipt`'.  It is important to note this data will always be stored in the browser's local storage until it is either manual deleted or removed in code (*I'll cover this later* &#129488;).  I can now access this data anywhere in my app! Let's see about retrieving ...
+Confirm that local storage has the proper information with the key set to '`receipt`'.  It is important to note this data will always be stored in the browser's local storage until it is either manual deleted or removed in code (*we''ll cover this later* &#129488;).  You can now access this data anywhere in my app! Let's see about retrieving ...
 
 ### Step 2. Retrieving Receipt Data for Display
 
@@ -175,13 +175,13 @@ As you can see, this portion is all about taking the data given and displaying i
 
 ### Step. 3 Add Private Route & Removing Data from Local Storage
 
-I've completed the component that will display information for the customer - now what &#129335;!? I want this information displayed as long as the customer hasn't navigated away - either by pressing **back** or clicking **shop again** button.  
+We've completed the component that will display information for the customer - now what &#129335;!? You want this information displayed as long as the customer hasn't navigated away - either by pressing **back** or clicking **shop again** button.  
 
 Once the customer navigates away, they should **NOT** be able to return and still render the receipt info.  
 
 #### Private Route for the `<CheckoutComplete />` component
 
-In order to achieve this I will setup a private route to the `<CheckoutComplete />` component that only renders if the '`receipt`' object is stored in local storage: 
+In order to achieve this you will need to setup a private route to the `<CheckoutComplete />` component that only renders if the '`receipt`' object is stored in local storage: 
 
 ```javascript
 // *** PrivateRouteReceipt.js ***
@@ -218,7 +218,7 @@ Let's add this private route to our `<CheckoutComplete />` component:
 
 The last step is to actually remove the data from local storage.  As mentioned, once the customer navigates from the page, they should not be able to navigate back again.  
 
-One obvious place to remove data from local storage is when `shop again` button is clicked.  I created a function that does this: 
+One obvious place to remove data from local storage is when `shop again` button is clicked.  Create a function that does this: 
 
 ```
 <Link to='/'>
@@ -233,9 +233,9 @@ const removeReceipt = () => {
 
 Once clicked, `removeReceipt()` will delete the key **'`receipt`'** from local storage.  Because of the private route created, the customer will not be able to navigate back to the conformation page.  
 
-Now - let's access what happens when a customer presses back.  The previous page is the checkout page which displays cart info and a form to capture a checkout.  I already have another private route setup to check if the **'`cart-id`'** key is in local storage - if `false` the customer will NOT be able to view the checkout page (***because that cart has already been emptied based on a successfully capture***) and will be routed home.
+Now - let's access what happens when a customer presses back.  The previous page is the checkout page which displays cart info and a form to capture a checkout.  You should already have another private route setup to check if the **'`cart-id`'** key is in local storage - if `false` the customer will NOT be able to view the checkout page (***because that cart has already been emptied based on a successfully capture***) and will be routed home.
 
-I now need to remove the **'`receipt`'** object (*from local storage*) whenever the `<ProductContainer />` component is loaded. Whenever the `<ProductContainer />` component is rendered (***which is essentially our home page***), there should **NEVER** be a **'`receipt`'** object in local storage.  I can simply add the removal in the `useEffect()` to always delete the desired key upon every render: 
+You now need to remove the **'`receipt`'** object (*from local storage*) whenever the `<ProductContainer />` component is loaded. Whenever the `<ProductContainer />` component is rendered (***which is essentially our home page***), there should **NEVER** be a **'`receipt`'** object in local storage.  You can simply add the removal in the `useEffect()` to always delete the desired key upon every render: 
 
 ```javascript
 // *** ProductContainer.js ***
@@ -267,11 +267,11 @@ Commerce.js has recently added webhook functionality within the Chec Dashboard. 
   <img src="src/img/Guide-4/webhook-events.JPG">
 </p>
 
-As you can see there are many different webhook events you can choose from.  This is very beneficial in that you don't have to ping an endpoint or use the SDK to see about certain data changes.  Once configured, your server will automatically get a notification (***a http post request***) whenever an event takes place.  In this example I will be configuring a webhook event for whenever an order is captured.  
+As you can see there are many different webhook events you can choose from.  This is very beneficial in that you don't have to ping an endpoint or use the SDK to see about certain data changes.  Once configured, your server will automatically get a notification (***a http post request***) whenever an event takes place.  In this example we will be configuring a webhook event for whenever an order is captured.  
 
 #### Setting up your endpoint
 
-As mentioned previously, you can setup your server using the technology of your choice - I choose to setup a popup server using Node.js:
+As mentioned previously, you can setup your server using the technology of your choice - We are choosing to setup a popup server using Node.js:
 
 ```javascript
 // *** index.js ***
@@ -284,7 +284,7 @@ server.listen(PORT, () => {
 });
 ```
 
-Further, once my server is setup, I will be using express to handle **`http`** requests.  For the purposes of this example, we only need to create one endpoint that accepts a **`POST`** request: 
+Further, once your server is setup, you will be using express to handle **`http`** requests.  For the purposes of this example, we only need to create one endpoint that accepts a **`POST`** request: 
 
 ```javascript
 // *** server.js ***
@@ -298,17 +298,17 @@ server.post('/new-order', (req, res) => {
         
 })
 ```
-For the moment, this is all that needs to be done.  In the next step I will configure the webhook in the Chec Dashboard with the newly created URL - **`myserver.com/new-order`**
+For the moment, this is all that needs to be done.  In the next step you will configure the webhook in the Chec Dashboard with the newly created URL - **`myserver.com/new-order`**
 
 ### Step 5. Add Webhook in Chec Dashboard
 
-Now that my endpoint is setup and I'm logging the **`req.body`** (*in order to see what's coming through*), I need to add that URL and configure the webhook from the Chec Dashboard.  Navigate to `Setup` and click the `Webhooks` tab.  Once you're in the `webhooks` menu, click **`+ ADD WEBHOOK`** button: 
+Now that your endpoint is setup and you are logging the **`req.body`** (*in order to see what's coming through*), you need to add that URL and configure the webhook from the Chec Dashboard.  Navigate to `Setup` and click the `Webhooks` tab.  Once you're in the `webhooks` menu, click **`+ ADD WEBHOOK`** button: 
 
 <p align="center">
   <img src="src/img/Guide-4/add-webhook-info.JPG">
 </p>
 
-Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the **`req.body`** so if the test runs successfully, I can see the webhook payload (*another word for data*). Under options click `View details`:
+Finish the process by clicking **`Add webhook`**.  Let's start off by sending a test to my server endpoint.  If you recall we're logging the **`req.body`** so if the test runs successfully, you can see the webhook payload (*another word for data*). Under options click `View details`:
 
 <p align="center">
   <img src="src/img/Guide-4/webhook-view-details.JPG">
@@ -320,7 +320,7 @@ You will see a button that says **`SEND TEST REQUEST`**.  If configured properly
   <img src="src/img/Guide-4/test-payload.JPG">
 </p>
 
-Because I sent back a *200* status code, a green check mark will display if successful: 
+Because we sent back a *200* status code, a green check mark will display if successful: 
 
 <p align="center">
   <img src="src/img/Guide-4/test-status-200.JPG">
@@ -328,17 +328,17 @@ Because I sent back a *200* status code, a green check mark will display if succ
 
 #### Capture an Order! 
 
-Remember, the ultimate goal is take some data that is sent to your server (***whenever the webhook event is triggered***) - then use the new data to send a notification to Slack.  Before I proceed, let's look at the payload whenever the webhook event is triggered.  All I have to do is capture an order and see the data that gets logged in my server ... 
+Remember, the ultimate goal is take some data that is sent to your server (***whenever the webhook event is triggered***) - then use the new data to send a notification to Slack.  Before we proceed, let's look at the payload whenever the webhook event is triggered.  All you have to do is capture an order and see the data that gets logged in my server ... 
 
 <p align="center">
   <img src="src/img/Guide-4/webhook-capture-payload.JPG">
 </p>
 
-With further investigation you'll notice this looks a lot like the response returned whenever an order is captured using the SDK helper function! We should take a step back and look at the big picture.  Because of this webhook provided by Commerce.js - whenever an order is captured the system will send that receipt data to the specified URL.  On the server side all I have to do is take that data and perform whatever task needed &#129299;. 
+With further investigation you'll notice this looks a lot like the response returned whenever an order is captured using the SDK helper function! We should take a step back and look at the big picture.  Because of this webhook provided by Commerce.js - whenever an order is captured the system will send that receipt data to the specified URL.  On the server side all you have to do is take that data and perform whatever task needed &#129299;. 
 
 ### Step 6. Send Notification Message to Slack Channel
 
-Now that I have the necessary data to compile a notification - I need to decide what to send to Slack.  I don't need everything; but just some important data I would like to be notified about in the event an order has been captured: 
+Now that you have the necessary data to compile a notification - you need to decide what to send to Slack.  You don't need everything; but just some important data that you would like to be notified about in the event an order has been captured: 
 
 - reference_id
 - name
@@ -347,7 +347,7 @@ Now that I have the necessary data to compile a notification - I need to decide 
 - '#' of items ordered
 - order amount
 
-I will [deconstuct](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) to get the data needed: 
+Next, [deconstuct](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) to get the data needed: 
 
 ```
 // *** server.js ***
@@ -359,13 +359,13 @@ let { customer_reference, customer, shipping, order } = req.body.payload
 
 In the spirit of webhooks - Slack has the ability to add incoming webhooks in order to post messages in a particular Slack workspace.  To achieve this, you **MUST** create a Slack App and give the specified Slack workspace access to the app.  [Here is a step by step!](https://slack.com/help/articles/115005265063-Incoming-Webhooks-for-Slack)
 
-For testing I created a brand new Slack workspace and gave the proper access to my Slack App **"New Order"**.  
+For testing we created a brand new Slack workspace and gave the proper access to my Slack App **"New Order"**.  
 
 <p align="center">
   <img src="src/img/Guide-4/slack-app-list.JPG">
 </p>
 
-I can now add an incoming webhook via Slack that will generate an URL.  This endpoint when sent a **`POST`** request with message data in the body will automatically post the message in the configured channel.  I set this incoming webhook to post in an ***#ecommerce*** channel created in my FTT Slack workspace. 
+You can now add an incoming webhook via Slack that will generate an URL.  This endpoint when sent a **`POST`** request with message data in the body will automatically post the message in the configured channel.  Set this incoming webhook to post in an ***#ecommerce*** channel created in my FTT Slack workspace. 
 
 <p align="center">
   <img src="src/img/Guide-4/slack-incoming-webhook.JPG">
@@ -373,7 +373,7 @@ I can now add an incoming webhook via Slack that will generate an URL.  This end
 
 #### Formatting the Slack message
 
-The Slack API has many ways to format a message and you can find those [HERE](https://api.slack.com/messaging/composing/layouts). I will be using `blocks` and creating an object that will be sent in a `POST` request: 
+The Slack API has many ways to format a message and you can find those [HERE](https://api.slack.com/messaging/composing/layouts). You will be using `blocks` and creating an object that will be sent in a `POST` request: 
 
 ```javascript
 // *** server.js ***
@@ -445,7 +445,7 @@ let newOrderMessage = {
 }
 ```
 
-As you can see I simply added the necessary data from the `req.body` to the `newOrderMessage` object.  This object will be sent in the body to the Slack incoming webhook URL provided in developer settings.  
+As you can see we simply added the necessary data from the `req.body` to the `newOrderMessage` object.  This object will be sent in the body to the Slack incoming webhook URL provided in developer settings.  
 
 #### Sending message to Slack
 
@@ -491,3 +491,6 @@ This guide is a continuation of a previous guide:
 * [Commerce.js (SDK)](https://commercejs.com/docs/)
 * [Node/Express](https://single-page-checkout-cjs.netlify.com/)
 
+## Authors
+
+Joseph Garcia - [Github](https://github.com/kingmoc/)
