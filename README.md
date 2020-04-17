@@ -15,6 +15,7 @@ This guide explains how to create a receipt page along with using webhooks provi
 ![](src/img/Guide-4/hero.JPG)
 
 ## Overview
+
 After we capture a checkout and processed the payment, we now want to provide some confirmation of purchase to the customer.  Thankfully the Commerce.js SDK (post capture) provides all the data needed in order to curate a 'receipt' or conformation page.  We will be using that data to display to the customer some of the order details and shipping info.  Lastly we will incorporate webhooks provided by Commerce.js via the Chec Dashboard to help send a Slack notification that a new order has been placed! Let's get started ... 
 
 #### This guide will cover: 
@@ -29,7 +30,7 @@ After we capture a checkout and processed the payment, we now want to provide so
 ### Requirements/Prerequisites
 
 - [ ] IDE of your choice (code editor)
-- [ ] [NodeJS](https://nodejs.org/en/), or [yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable) → npm or yarn.
+- [ ] npm (npm comes installed with [NodeJS](https://nodejs.org/en/)) or [yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable)
 - [ ] Some knowledge of Javascript & React
 - [ ] Some knowledge of [webhooks](https://sendgrid.com/blog/whats-webhook/)
 - [ ] *Bonus* - Using [React Hooks](https://reactjs.org/docs/hooks-reference.html) - specifically `useState()`
@@ -42,9 +43,17 @@ After we capture a checkout and processed the payment, we now want to provide so
 
 ### STEP 1. Saving Receipt Info to Local Storage:
 
-The SDK previously provided a helper function you could pass the checkout token and get the receipt info - unfortunately that function is no longer live &#128532;.  This is because under the hood, the function hit an endpoint that required your secret key.  The SDK only utilizes helper functions with your public API key.  
+<!-- maybe mention that most of the receipt object data can later on be fetched from the order endpoint by making a request from a server using a Chec secret API key. -->
 
-No worries &#128515; - you can make use of the browser's local storage as a way to save data.  Let's take a look at the response from capturing a checkout:   
+Because certain data that is saved after a successfully checkout is private - Commerce.js requires the use of your secret API key in order to fetch that data.  If you recall - anytime you utilizes a SDK helper function, you're actually using a public key.  
+
+This guide will cover saving that data post capture to local storage, and then retrieving it later in my **`<CheckoutComplete />`** component. Alternatively if you don't like saving data in local storage (*important to remember you must **ALWAYS** remove from local storage*) - you could make an api call using your secret key to this endpoint: 
+
+```
+v1/orders/{order_id}
+``` 
+
+But for simplicity and remembering to remove the data from the browser, we will proceed with the stated method - let's take a look at the response from capturing a checkout:   
 
 <p align="center">
   <img src="src/img/Guide-4/post-capture.JPG">
